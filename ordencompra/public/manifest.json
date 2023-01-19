@@ -1,0 +1,48 @@
+{
+  "_version": "1.32.0",
+  "sap.cloud": {
+    "service": "visoc"
+  },
+  "sap.app": {
+    "id": "visoc",
+    "type": "application",
+    "applicationVersion": {
+      "version": "1.0.6"
+    },
+      "title": "Visualizacion de Ordenes de Compra",
+      "description": "App para ordenes de compra",
+      "info": "App para ordenes de compra",
+      "crossNavigation": {
+          "inbounds": {
+              "external": {
+                  "semanticObject": "ExternalUrl",
+                  "action": "display",
+                  "icon": "sap-icon://sales-order",
+                  "title": "Ver OC",
+                  "subTitle": "App Comprador"
+              }
+          }
+      }
+  },
+  "sap.flp": {
+      "type": "application",
+      "config": {
+          "target": {
+              "type": "URL",
+              "url": "https://iprovider-sme-iybp72ix.launchpad.cfapps.eu10.hana.ondemand.com/ed988302-6d43-46c0-b85e-5c443d1848ca.visoc.visoc-1.0.6/index.html",
+              "navmode": "inplace",
+              "parameters": {
+                
+              }
+          }
+      }
+  },
+  "sap.ui": {
+      "technology": "URL",
+      "deviceTypes": {
+          "desktop": true,
+          "tablet": true,
+          "phone": true
+      }
+  }
+}

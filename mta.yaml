@@ -1,0 +1,74 @@
+_schema-version: "3.2"
+ID: visoc
+version: 1.0.0
+modules:
+  - name: destination_cofig # modulo de configuracion de destination para habilitar el html5 host en el launchpad service
+    type: com.sap.application.content
+    requires:
+    - name: sb-sample-destination-service # Nombre del recurso del destination service
+      parameters:
+        content-target: true
+    - name: iprovider-visoc-html-repo-host # nombre del recurso del html5 host
+      parameters:
+        service-key:
+          name: iprovider-visoc-html-repo-host-key # HTML5 HOST Api key que dara permisos al destination para poder presentar el servicio   
+    - name: xsuaa_sb # Nombre del recurso del xsuaa service
+      parameters:
+        service-key:
+          name: xsuaa_sb-key # XSUAA Api key que dara permisos al destination para poder presentar el servicio   
+    parameters:
+      content:
+        instance:
+          destinations: # Lista de destination que permitiran el acceso a la aplicacion en btp y activaran el token exchange      
+          - Name: iprovider-visoc_html_repo_host # Nombre del destino
+            ServiceInstanceName: iprovider-visoc-html-repo-host-service # html5 host service name en btp
+            ServiceKeyName: iprovider-visoc-html-repo-host-key # HTML5 HOST Api key que dara permisos al destination para poder presentar el servicio   
+            sap.cloud.service: visoc # nombre del solucion / app (unico entre apps)
+          - Authentication: OAuth2UserTokenExchange # Modo de authenticacion / token flow
+            Name: iprovider-visoc_uaa # Nombre del destino
+            ServiceInstanceName: sample-sb-xsuaa-service  # xsuaa service name en btp
+            ServiceKeyName: xsuaa_sb-key  # XSUAA Api key que dara permisos al destination para poder presentar el servicio
+            sap.cloud.service: visoc # nombre del solucion / app (unico entre apps)
+          existing_destinations_policy: ignore # acciones que tomar si es que encuentra un destino con el mismo nombre update/ignore
+    build-parameters:
+      no-source: true
+  - name: deployer # Modulo de despliegue del compilado de la app
+    type: com.sap.application.content
+    path: . # carpeta al mismo nivel que el mta.yaml que contiene la app
+    requires:
+      - name: iprovider-visoc-html-repo-host # nombre del recurso del html5 host
+        parameters:
+          content-target: true
+    build-parameters:
+      build-result: resources # carpeta donde se tendra el resultado
+      requires:
+        - artifacts:
+            - result-content.zip # resultado del compilado en .zip
+          name: compiler
+          target-path: resources/ # carpeta donde se tendra el resultado
+  - name: compiler # Modulo de compilacion de la aplicacion frontend
+    type: html5
+    path: ordencompra # carpeta al mismo nivel que el mta.yaml que contiene la app
+    build-parameters:
+      build-result: . # carpeta dentro de la carpeta asignada en el PATH donde se tendra el resultado de la compilacion
+      builder: custom
+      commands: # comandos para realizar la compilacion
+        - npm install
+        - npm run build:cf
+      supported-platforms: []
+resources:
+- name: iprovider-visoc-html-repo-host # nombre del recurso del html5 host
+  type: org.cloudfoundry.managed-service
+  parameters:
+    service: html5-apps-repo
+    service-name: iprovider-visoc-html-repo-host-service # html5 host service name en btp
+    service-plan: app-host
+- name: sb-sample-destination-service # Nombre del recurso del destination service
+  type: org.cloudfoundry.existing-service
+  parameters:
+    service-name: sb-sample-destination-service # Destination service name en btp
+- name: xsuaa_sb # Nombre del recurso del xsuaa service
+  type: org.cloudfoundry.existing-service
+  parameters:
+    service-name: sample-sb-xsuaa-service # xsuaa service name en btp
+    
